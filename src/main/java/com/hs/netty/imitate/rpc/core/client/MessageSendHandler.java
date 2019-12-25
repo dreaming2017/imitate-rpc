@@ -12,6 +12,11 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+/**
+ * 这个 mapCallBack 相当于dubbo中rpc客户端的futures
+ * @author 王海生
+ *
+ */
 public class MessageSendHandler extends ChannelInboundHandlerAdapter {
 	/**
 	 * key为messageId

@@ -5,6 +5,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.hs.netty.imitate.rpc.model.MessageRequest;
 import com.hs.netty.imitate.rpc.model.MessageResponse;
 
@@ -14,6 +17,7 @@ import com.hs.netty.imitate.rpc.model.MessageResponse;
  *
  */
 public class MessageCallBack {
+	private static final Logger logger = LoggerFactory.getLogger(MessageCallBack.class);
 	private MessageRequest request;
 	private MessageResponse response;
 	private Lock lock = new ReentrantLock();
@@ -32,10 +36,12 @@ public class MessageCallBack {
 				response.setMessageId(request.getMessageId()); //这里只是设置了，后面要进行优化处理
 				return response.getResultDesc(); //这里只返回结果，后面要优化起来!
 			} else {
+				//这部分代码后面要考虑优化
 				response = new MessageResponse();
 				response.setMessageId(request.getMessageId());
 				response.setError("timeOut");
-				System.out.println(response.toString());
+				logger.info(">>>>[rpc client ] MessageCallBack start() ...response={}",response);
+				//System.out.println(response.toString());
 				return null;
 			}
 		} finally {

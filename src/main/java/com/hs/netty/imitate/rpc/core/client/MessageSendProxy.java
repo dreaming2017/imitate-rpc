@@ -13,12 +13,6 @@ import com.hs.netty.imitate.rpc.model.MessageRequest;
  *
  */
 public class MessageSendProxy<T> implements InvocationHandler {
-	private Class<T> cls;
-
-	public MessageSendProxy(Class<T> cls) {
-		this.cls = cls;
-	}
-
 	//构建请求是在这里的
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
@@ -33,6 +27,7 @@ public class MessageSendProxy<T> implements InvocationHandler {
         MessageSendHandler handler = RpcServerLoader.getInstance().getMessageSendHandler();
         MessageCallBack callBack = handler.sendRequest(request);
         return callBack.start();
+        
 	}
 
 }

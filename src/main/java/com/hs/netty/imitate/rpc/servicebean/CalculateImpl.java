@@ -6,7 +6,8 @@ public class CalculateImpl implements Calculate {
     //两数相加
     public Integer add(int a, int b) {
     	try {
-			Thread.sleep(1000* new Random().nextInt(10));
+			//Thread.sleep(1000* new Random().nextInt(10));
+    		Thread.sleep(20);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

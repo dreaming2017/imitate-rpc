@@ -1,22 +1,27 @@
 package com.hs.netty.imitate.rpc.core.server;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hs.netty.imitate.rpc.model.MessageRequest;
 import com.hs.netty.imitate.rpc.model.MessageResponse;
 
-public class MessageRecvInitializeTask implements Runnable {
-
+/**
+ * 服务端的任务
+ * @author 王海生
+ *
+ */
+public class MessageRecvInitializeTask  implements Callable<Boolean> {
+	private static Logger logger = LoggerFactory.getLogger(MessageRecvInitializeTask.class);
 	private MessageRequest request = null;
 	private MessageResponse response = null;
 	private Map<String, Object> handlerMap = null;
-	private ChannelHandlerContext ctx = null;
 
 	public MessageResponse getResponse() {
 		return response;
@@ -30,34 +35,18 @@ public class MessageRecvInitializeTask implements Runnable {
 		this.request = request;
 	}
 
+	
+	 MessageRecvInitializeTask(MessageRequest request, MessageResponse response, Map<String, Object> handlerMap) {
+	        this.request = request;
+	        this.response = response;
+	        this.handlerMap = handlerMap;
+	    }
+	
 	MessageRecvInitializeTask(MessageRequest request, MessageResponse response,
 			Map<String, Object> handlerMap, ChannelHandlerContext ctx) {
 		this.request = request;
 		this.response = response;
 		this.handlerMap = handlerMap;
-		this.ctx = ctx;
-	}
-
-	@Override
-	public void run() {
-		response.setMessageId(request.getMessageId());
-		try {
-			Object result = reflect(request);
-			response.setResultDesc(result);
-		} catch (Throwable t) {
-			response.setError(t.toString());
-			t.printStackTrace();
-			System.err.printf("RPC Server invoke error!\n");
-		}
-
-		ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
-			public void operationComplete(ChannelFuture channelFuture)
-					throws Exception {
-				System.out.println("RPC Server Send message-id respone:"
-						+ request.getMessageId());
-			}
-		});
-
 	}
 
 	/**
@@ -73,6 +62,21 @@ public class MessageRecvInitializeTask implements Runnable {
 		String methodName = request.getMethodName();
 		Object[] parameters = request.getParametersVal();
 		return MethodUtils.invokeMethod(serviceBean, methodName, parameters);
+	}
+
+	@Override
+	public Boolean call() throws Exception {
+		response.setMessageId(request.getMessageId());
+		try {
+			Object result = reflect(request);
+			response.setResultDesc(result);
+			return Boolean.TRUE;
+		} catch (Throwable t) {
+			response.setError(t.toString());
+			t.printStackTrace();
+			logger.error("RPC Server invoke error!\n");
+			return Boolean.FALSE;
+		}
 	}
 
 }

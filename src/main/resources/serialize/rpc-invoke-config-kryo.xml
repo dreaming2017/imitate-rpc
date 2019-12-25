@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+  <context:component-scan base-package="com.hs.netty.imitate.rpc.core"/>
+  <context:property-placeholder location="classpath:properties/rpc-server-kryo.properties"/>
+  
+  <bean id="rpcServer" class="com.hs.netty.imitate.rpc.core.server.MessageRecvExecutor">
+    <constructor-arg name="serverAddress" value="${rpc.server.addr}"/>
+    <constructor-arg name="serializeProtocol" value="KRYOSERIALIZE"/>
+  </bean>
+  
+  <bean id="rpcbean" class="com.hs.netty.imitate.rpc.model.MessageKeyVal">
+    <property name="messageKeyVal">
+      <map>
+        <entry key="com.hs.netty.imitate.rpc.servicebean.Calculate">
+          <ref bean="calc"/>
+        </entry>
+        
+         <entry key="com.hs.netty.imitate.rpc.servicebean.Person">
+          <ref bean="personImpl"/>
+        </entry>
+      </map>
+    </property>
+  </bean>
+  <bean id="calc" class="com.hs.netty.imitate.rpc.servicebean.CalculateImpl"/>
+  <bean id="personImpl" class="com.hs.netty.imitate.rpc.servicebean.PersonImpl"/>
+  
+</beans>
